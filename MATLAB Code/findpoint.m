@@ -75,11 +75,11 @@ elseif sign1==1
 %     disp('Judgement: 1')
     P = P1;
 end
-% fprintf('Infleciton Point：%d\n', P)
-% subplot(2, 1, 2)
-% plot(x, y, 'k', x, smo_y, 'r',x(P),y(P),'*')
-% legend('原始数据','10% robust local regression滤波','凝血点')
-% text(x(P),y(P),['(',num2str(x(P)),',',num2s tr(y(P)),')'],'color','b')
+fprintf('Infleciton Point：%d\n', P)
+subplot(2, 1, 2)
+plot(x, y, 'k', x, smo_y, 'r',x(P),y(P),'*')
+legend('原始数据','10% robust local regression滤波','凝血点')
+text(x(P),y(P),['(',num2str(x(P)),',',num2s tr(y(P)),')'],'color','b')
 end
 
 
