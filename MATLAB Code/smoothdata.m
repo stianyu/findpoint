@@ -10,25 +10,25 @@ if dim == 2
     n = t;
 end
 smoothy = zeros(m, n);
-for l = 1:n
+for k = 1:n
     for i = 1:m
         s = 0;
         if i<(span+1)/2
             for j = 1:i
-                s = s + data(i-1+j,l);
+                s = s + data(i-j-1,k) + data(i+j-1,k);
             end
-            smoothy(i,l) = s/j;
+            smoothy(i,k) = (s - data(i,k))/(2*i-1);
         elseif i>m-(span-1)/2
-            for j = i:m
-                s = s + data(j,l);
+            for j = 1:m-i
+                s = s + data(i-j-1,k) + data(i+j-1,k);
             end
-            smoothy(i,l) = s/(m-i+1);
+            smoothy(i,k) = (s - data(i,k))/((m-i)*2+1);
         else
             for j = 1:(span-1)/2
-                s = s +  data(i-j,l) + data(i+j,l);         
+                s = s +  data(i-j,k) + data(i+j,k);         
             end
-            s = s + data(i,l);
-            smoothy(i,l) = s/span;
+            s = s + data(i,k);
+            smoothy(i,k) = s/span;
         end
     end
 end
