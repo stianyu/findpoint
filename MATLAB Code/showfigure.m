@@ -15,8 +15,9 @@ cttt = ct(2,:);
 % end
 %%
 % close all
-sTT = smoothdata(TT, 19, 1);
-% CompareTwoFigure(TT,sTT,cttt)
+sTT = smoothdata(TT(:,2), 19, 1);
+sTT2 = smooth(TT(:,2), 19);
+CompareTwoFigure(sTT,sTT2,cttt)
 %%
 close all
 y = diff(sTT);

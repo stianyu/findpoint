@@ -14,15 +14,15 @@ for k = 1:n
     for i = 1:m
         s = 0;
         if i<(span+1)/2
-            for j = 1:i
-                s = s + data(i-j-1,k) + data(i+j-1,k);
+            for j = 1:i-1
+                s = s + data(i-j,k) + data(i+j,k);
             end
-            smoothy(i,k) = (s - data(i,k))/(2*i-1);
+            smoothy(i,k) = (s + data(i,k))/(2*i-1);
         elseif i>m-(span-1)/2
             for j = 1:m-i
-                s = s + data(i-j-1,k) + data(i+j-1,k);
+                s = s + data(i-j,k) + data(i+j,k);
             end
-            smoothy(i,k) = (s - data(i,k))/((m-i)*2+1);
+            smoothy(i,k) = (s + data(i,k))/((m-i)*2+1);
         else
             for j = 1:(span-1)/2
                 s = s +  data(i-j,k) + data(i+j,k);         
