@@ -15,9 +15,12 @@ cttt = ct(2,:);
 % end
 %%
 % close all
-sTT = smoothdata(TT(:,2), 19, 1);
-sTT2 = smooth(TT(:,2), 19);
-CompareTwoFigure(sTT,sTT2,cttt)
+y = TT;
+sTT = smoothdata(y, 19, 1);
+% sTT2 = smooth(TT(:,2), 19);
+% CompareTwoFigure(sTT,sTT2,cttt)
+%%
+sTTfout=filloutliers(y);
 %%
 close all
 y = diff(sTT);
@@ -25,25 +28,37 @@ y = diff(sTT);
 % CompareTwoFigure(y2, y, cttt);
 [m, n] = size(y);
 w = 10;
-A = zeros(m-w+1, n);
-sqrtP = zeros(m-w+1, n);
-S = zeros(m-w+1, n);
-R = zeros(m-w+1, n);
+rest = mod(m, w);
+numw = (m - rest) / w;
+A = zeros(numw+1, n);
+sqrtP = zeros(numw+1, n);
+S = zeros(numw+1, n);
+R = zeros(numw+1, n);
 for col = 1:n  % n列TT数据
-    for row = 1:m-w+1  % 时间窗为w
+    for row = 1:numw  % 时间窗为w
         a = 0;
         p = 0;
-        for i = row:row+w-1
-            a = a + abs(y(i, col));
-            p = p + abs(y(i, col))^2;
+        for i = 1:w
+            a = a + abs(y((row-1)*10+i, col));
+            p = p + abs(y((row-1)*10+i, col))^2;
         end
         A(row, col) = a;
         sqrtP(row, col) = sqrt(p/w);
         S(row, col) = sqrt(abs(p/w - a^2));
-        R(row, col) = max(y(row:row+w-1,col))-min(y(row:row+w-1,col));
+        R(row, col) = max(y((row-1)*10+1:(row-1)*10+w,col))-min(y((row-1)*10+1:(row-1)*10+w,col));
     end
+    a = 0;
+    p = 0;
+    for i = 1:rest
+        a = a + abs(y(numw*10+i, col));
+        p = p + abs(y(numw*10+i, col))^2;
+    end
+    A(w+1, col) = a;
+    sqrtP(w+1, col) = sqrt(p/w);
+    S(w+1, col) = sqrt(abs(p/w - a^2));
+    R(w+1, col) = max(y(numw*10+1:end, col)) - min(y(numw*10+rest:end, col));
 end
-% CompareFourFearture(sTT, A, sqrtP, S, R, cttt)
+CompareFourFearture(sTT, A, sqrtP, S, R, cttt)
 %% 
 function CompareTwoFigure(y1, y2, xx)
 if size(y1,1) == size(y2,1)
@@ -62,12 +77,12 @@ function CompareFourFearture(sy, A, sqrtP, S, R, ct)
 [p, q] = size(A);
 x = 1:p;
 if n~=q
-    disp('传入参数的dim=2不符合，请检查')
+    disp('传入参数的列数不符合，请检查')
 else
     w = m - p;
     for i = 1:n
         subplot(2,1,1)
-        plot(x,sy(1:end-w,i),ct(i),sy(ct(i),i),'*')
+        plot(1:m,sy(:,i),ct(i),sy(ct(i),i),'*')
         subplot(2,1,2)
         plot(x,A(:,i),'r',x,sqrtP(:,i),'y',x,S(:,i),'k',x,R(:,i),'g')
         figure
