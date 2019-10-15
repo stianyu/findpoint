@@ -1,3 +1,4 @@
+% 加载原始数据
 close all
 clear all
 load('ct.mat')
@@ -14,14 +15,14 @@ cttt = ct(2,:);
 %     figure
 % end
 %%
-% close all
-y = TT;
-sTT = smoothdata(y, 19, 1);
+% 滑动平滑滤波原始函数
+sTT = smoothdata(TT(:,1), 19, 1);
 % sTT2 = smooth(TT(:,2), 19);
 % CompareTwoFigure(sTT,sTT2,cttt)
 %%
-sTTfout=filloutliers(y);
+%%sTTfout=filloutliers(y);
 %%
+% 特征参数的计算
 close all
 y = diff(sTT);
 % y2 = diff(TT);
@@ -59,14 +60,49 @@ for col = 1:n  % n列TT数据
     R(w+1, col) = max(y(numw*10+1:end, col)) - min(y(numw*10+rest:end, col));
 end
 CompareFourFearture(sTT, A, sqrtP, S, R, cttt)
-%% 
+%%
+%选择特征参数S，设定阈值找到异常段，并用插值方法补充
+feature = S;
+maxS = max(S);
+threshold = 0.2;
+for j = 1:size(S, 2)
+    for i = 1:size(S, 1)
+        if S(i, j) >= maxS(j) * threshold
+            feature(i, j) = 1;
+            if feature(i-1, j) == 0
+                beg = i;
+            elseif S(i+1, j) < maxS(j) * threshold
+                stp = i;
+            end
+        else
+            feature(i, j) = 0;
+        end
+    end
+end
+beg = (beg - 1) * 10;
+stp = (stp + 1) * 10;
+length = (stp - beg + 1) * 10;
+hold on
+thresholdy = ones(size(S, 1), 1)*maxS*threshold;
+plot(1:size(S, 1), thresholdy)
+%%
+interx = [beg; stp];
+intery = TT(interx, 1);
+% intery = intery';
+interX = beg+1:1:stp-1;
+interresult = interp1(interx, intery, interX');
+TT(interX) =  interresult;
+CompareFourFearture(TT(:, 1), A, sqrtP, S, R, cttt)
+%%
 function CompareTwoFigure(y1, y2, xx)
 if size(y1,1) == size(y2,1)
     n = size(y1,1);
     x = 1:n;
     for i = 1:size(y1, 2)
         plot(x, y1(:,i), 'k', x, y2(:,i), 'r',xx(i), y1(xx(i),i), '*')
-        figure
+        if i ~= size(y1, 2)
+            figure
+        end
     end
 else
     disp('两个变量大小不一样，无法生成比较图片')
@@ -85,7 +121,9 @@ else
         plot(1:m,sy(:,i),ct(i),sy(ct(i),i),'*')
         subplot(2,1,2)
         plot(x,A(:,i),'r',x,sqrtP(:,i),'y',x,S(:,i),'k',x,R(:,i),'g')
-        figure
+        if i ~= n
+            figure
+        end
     end
 end
 end
