@@ -16,7 +16,8 @@ cttt = ct(2,:);
 % end
 %%
 % 滑动平滑滤波原始函数
-sTT = smoothdata(TT(:,1), 19, 1);
+colum = 3;
+sTT = smoothdata(TT(:, colum), 19, 1);
 % sTT2 = smooth(TT(:,2), 19);
 % CompareTwoFigure(sTT,sTT2,cttt)
 %%
@@ -65,14 +66,17 @@ CompareFourFearture(sTT, A, sqrtP, S, R, cttt)
 feature = S;
 maxS = max(S);
 threshold = 0.2;
+beg = [];
+stp = [];
 for j = 1:size(S, 2)
     for i = 1:size(S, 1)
         if S(i, j) >= maxS(j) * threshold
             feature(i, j) = 1;
-            if feature(i-1, j) == 0
-                beg = i;
-            elseif S(i+1, j) < maxS(j) * threshold
-                stp = i;
+            if i == 1 || feature(i-1, j) == 0
+                beg(end+1) = i;
+            end
+            if S(i+1, j) < maxS(j) * threshold
+                stp(end+1) = i;
             end
         else
             feature(i, j) = 0;
@@ -80,6 +84,9 @@ for j = 1:size(S, 2)
     end
 end
 beg = (beg - 1) * 10;
+if beg(1) == 0
+    beg(1) = 1;
+end
 stp = (stp + 1) * 10;
 length = (stp - beg + 1) * 10;
 hold on
@@ -87,12 +94,17 @@ thresholdy = ones(size(S, 1), 1)*maxS*threshold;
 plot(1:size(S, 1), thresholdy)
 %%
 interx = [beg; stp];
-intery = TT(interx, 1);
-% intery = intery';
-interX = beg+1:1:stp-1;
-interresult = interp1(interx, intery, interX');
-TT(interX) =  interresult;
-CompareFourFearture(TT(:, 1), A, sqrtP, S, R, cttt)
+for i = 1:size(interx, 2)
+    intery = TT(interx(:, i), colum);
+    % intery = intery';
+    interX = beg(i)+1:stp(i)-1;
+    interresult = interp1(interx(:, i), intery, interX');
+    TT(interX, colum) =  interresult;
+    message = sprintf('替换了：%d - %d\r', beg, stp);
+    disp(message)
+end
+CompareFourFearture(TT(:, colum), A, sqrtP, S, R, cttt)
+findP(TT(:, colum));
 %%
 function CompareTwoFigure(y1, y2, xx)
 if size(y1,1) == size(y2,1)
