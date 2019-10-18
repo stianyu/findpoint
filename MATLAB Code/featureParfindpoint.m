@@ -1,4 +1,3 @@
-% 加载原始数据
 close all
 clear all
 load('ct.mat')
@@ -16,7 +15,7 @@ cttt = ct(2,:);
 % end
 %%
 % 滑动平滑滤波原始函数
-colum = 3;
+colum = 5;
 sTT = smoothdata(TT(:, colum), 19, 1);
 % sTT2 = smooth(TT(:,2), 19);
 % CompareTwoFigure(sTT,sTT2,cttt)
@@ -104,6 +103,7 @@ for i = 1:size(interx, 2)
     disp(message)
 end
 CompareFourFearture(TT(:, colum), A, sqrtP, S, R, cttt)
+%%
 findP(TT(:, colum));
 %%
 function CompareTwoFigure(y1, y2, xx)

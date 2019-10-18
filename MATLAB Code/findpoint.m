@@ -7,7 +7,7 @@ num = length(y);
 x = 1:num;
 span = 19; % 
 % smo_y2 = smooth(x, y, 0.1, 'rloess'); 
-smo_y = smoothdata(y, span); % using moving average filter with a span of 
+smo_y = smoothdata(y, span, 1); % using moving average filter with a span of 
                               % 19 to smooth data, span should be a odd
                               % number.
 % plot(x,smo_y,'k',x,smo_y2,'r')
