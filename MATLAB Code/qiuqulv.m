@@ -4,21 +4,19 @@ close all
 dirname = 'D:\1 科研项目\2 凝血点\王工\9.26联调\9.26'; 
 filelist = getallfiles(dirname);
 %%
-clc;
-close all
+clc;close all
+x0 = 1:1950;
 % for j = 1:length(filelist)
-    x0 = 1:1950;
     j = 8;
     ALL = xlsread(filelist{j}, 'A51:E2000');
-    alldata = filloutliers(ALL(:,5), 'linear');
+%     alldata = filloutliers(ALL(:,5), 'linear');
 %     for i = 1:5
         %求解曲率
         %x0,y0验证函数离散点，可以非等间隔
         i = 5;
         data = smoothdata(ALL(:,i), 9, 1);
 %         data = smooth(x0, alldata(:,i), 0.1, 'rloess');
-        y0 = data;
-        y0 = y0';
+        y0 = data';
         h1 = abs(diff(x0)) ;
         h = [h1 h1(end)];
         ht = h;
@@ -42,6 +40,7 @@ close all
         subplot(2, 2, 4)
         plot(x0, yapp2,'k', x0, yapp22, 'r', x0, delta_yapp2,'g')
         title([num2str(j),'.xls中',num2str(i),'列二阶导'])
+        
         [~,maxFlag] = max(k2);
         [~,maxFlag2] = max(k22);
         % [~,maxFlag] = max(k2);%曲率最大位置
@@ -69,3 +68,8 @@ for i = 1:length(x0)
     end
 end
 end
+
+
+
+
+
